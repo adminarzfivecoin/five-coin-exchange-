@@ -1,10 +1,13 @@
 # five-coin-exchange-
 Official five coin cryptocurrency exchange
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Five Exchange - Swap</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -22,11 +25,21 @@ Official five coin cryptocurrency exchange
     header img {
       height: 40px;
     }
+    nav {
+      display: flex;
+      align-items: center;
+    }
     nav a {
       color: #ccc;
       margin: 0 12px;
       text-decoration: none;
       font-weight: 500;
+      cursor: pointer;
+    }
+    #wallet-address {
+      color: gold;
+      font-size: 14px;
+      margin-left: 12px;
     }
     .container {
       max-width: 480px;
@@ -72,13 +85,15 @@ Official five coin cryptocurrency exchange
   <header>
     <img src="logo.png" alt="Five Exchange Logo" />
     <nav>
-      <a href="#">Swap</a>
-      <a href="#">Pools</a>
-      <a href="#">Tokens</a>
-      <a href="#">Docs</a>
-      <a href="#">Connect Wallet</a>
+      <a>Swap</a>
+      <a>Pools</a>
+      <a>Tokens</a>
+      <a>Docs</a>
+      <a id="connect-btn">Connect Wallet</a>
+      <span id="wallet-address"></span>
     </nav>
   </header>
+
   <div class="container">
     <h2 style="text-align: center; margin-bottom: 30px;">Swap Your Tokens</h2>
     <div class="swap-box">
@@ -87,22 +102,49 @@ Official five coin cryptocurrency exchange
         <option value="FIVE">FIVE</option>
         <option value="TON">TON</option>
       </select>
-      <input type="number" placeholder="Amount" /><label for="to-token">You Receive</label>
-  <select id="to-token">
-    <option value="TON">TON</option>
-    <option value="FIVE">FIVE</option>
-  </select>
-  <input type="text" placeholder="Estimated Amount" disabled />
+      <input type="number" placeholder="Amount" id="from-amount" />
 
-  <button id="swap-btn">Swap</button>
-</div>
+      <label for="to-token">You Receive</label>
+      <select id="to-token">
+        <option value="TON">TON</option>
+        <option value="FIVE">FIVE</option>
+      </select>
+      <input type="text" placeholder="Estimated Amount" disabled id="to-amount"/>
 
+      <button id="swap-btn">Swap</button>
+    </div>
   </div>
+
   <footer>
     &copy; 2025 Five Exchange | Powered by TON
-  </footer>  <script>
-    document.getElementById('swap-btn').addEventListener('click', () => {
-      alert('Swap initiated (simulation only). Connect wallet feature pending.');
+  </footer>
+
+  <script>
+    const connector = new TonConnect();
+
+    async function connectWallet() {
+      await connector.restoreConnection();
+
+      if (!connector.connected) {
+        await connector.connect({
+          universalLink: 'https://app.tonkeeper.com/ton-connect',
+          bridgeUrl: 'https://bridge.tonapi.io/bridge'
+        });
+      }
+
+      if (connector.connected) {
+        const walletAddress = connector.wallet.account.address;
+        document.getElementById("wallet-address").textContent = "Wallet: " + walletAddress;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById("connect-btn").addEventListener("click", connectWallet);
+
+      document.getElementById('swap-btn').addEventListener('click', () => {
+        alert('Swap function coming soon. Wallet connected.');
+      });
     });
-  </script></body>
+  </script>
+</body>
 </html>

@@ -7,7 +7,7 @@ Official five coin cryptocurrency exchange
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Five Exchange - Swap</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -120,30 +120,22 @@ Official five coin cryptocurrency exchange
   </footer>
 
   <script>
-    const connector = new TonConnect();
-
-    async function connectWallet() {
-      await connector.restoreConnection();
-
-      if (!connector.connected) {
-        await connector.connect({
-          universalLink: 'https://app.tonkeeper.com/ton-connect',
-          bridgeUrl: 'https://bridge.tonapi.io/bridge'
-        });
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: 'https://adminarzfivecoin.github.io/five-exchange/tonconnect-manifest.json',
+      buttonRootId: 'connect-btn',
+      uiPreferences: {
+        theme: 'DARK'
       }
+    });
 
-      if (connector.connected) {
-        const walletAddress = connector.wallet.account.address;
-        document.getElementById("wallet-address").textContent = "Wallet: " + walletAddress;
+    tonConnectUI.onStatusChange(wallet => {
+      if (wallet && wallet.account) {
+        document.getElementById("wallet-address").textContent = "Wallet: " + wallet.account.address;
       }
-    }
+    });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById("connect-btn").addEventListener("click", connectWallet);
-
-      document.getElementById('swap-btn').addEventListener('click', () => {
-        alert('Swap function coming soon. Wallet connected.');
-      });
+    document.getElementById('swap-btn').addEventListener('click', () => {
+      alert('Swap function coming soon. Wallet connected.');
     });
   </script>
 </body>

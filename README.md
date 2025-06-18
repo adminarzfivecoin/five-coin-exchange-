@@ -1,5 +1,3 @@
-# five-coin-exchange-
-Official five coin cryptocurrency exchange
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,6 +26,7 @@ Official five coin cryptocurrency exchange
     nav {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
     }
     nav a {
       color: #ccc;
@@ -35,6 +34,9 @@ Official five coin cryptocurrency exchange
       text-decoration: none;
       font-weight: 500;
       cursor: pointer;
+    }
+    #connect-btn {
+      margin-left: 12px;
     }
     #wallet-address {
       color: gold;
@@ -89,7 +91,7 @@ Official five coin cryptocurrency exchange
       <a>Pools</a>
       <a>Tokens</a>
       <a>Docs</a>
-      <a id="connect-btn">Connect Wallet</a>
+      <div id="connect-btn"></div> <!-- ✅ اینجا div گذاشتیم -->
       <span id="wallet-address"></span>
     </nav>
   </header>

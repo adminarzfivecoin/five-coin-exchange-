@@ -52,7 +52,7 @@
       margin-bottom: 6px;
       color: #aaa;
     }
-    .swap-box input, .swap-box select {
+    .swap-box input {
       width: 100%;
       padding: 12px;
       margin-bottom: 16px;
@@ -60,6 +60,7 @@
       border: none;
       background-color: #2c2c2c;
       color: #fff;
+      font-size: 16px;
     }
     button {
       width: 100%;
@@ -69,6 +70,7 @@
       background-color: gold;
       font-weight: bold;
       cursor: pointer;
+      font-size: 16px;
     }
     footer {
       margin-top: 40px;
@@ -96,7 +98,7 @@
     <h2 style="text-align: center; margin-bottom: 30px;">Swap TON → FIVE</h2>
     <div class="swap-box">
       <label for="from-amount">Amount (TON)</label>
-      <input type="number" placeholder="Amount" id="from-amount" />
+      <input type="number" placeholder="Amount" id="from-amount" min="0" step="any" />
       <button id="swap-btn">Send TON & Receive FIVE</button>
     </div>
   </div>
@@ -106,18 +108,27 @@
   </footer>
 
   <script>
+    // ساخت TonConnectUI با manifest شما و لینک دکمه اتصال
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
       manifestUrl: 'https://adminarzfivecoin.github.io/five-exchange/tonconnect-manifest.json',
       buttonRootId: 'connect-btn',
       uiPreferences: { theme: 'DARK' }
     });
 
-    tonConnectUI.onStatusChange(wallet => {
+    // متغیر ذخیره کیف پول متصل
+    let wallet = null;
+
+    // بروزرسانی وضعیت اتصال کیف پول
+    tonConnectUI.onStatusChange(newWallet => {
+      wallet = newWallet;
       if (wallet && wallet.account) {
         document.getElementById("wallet-address").textContent = "Wallet: " + wallet.account.address;
+      } else {
+        document.getElementById("wallet-address").textContent = "";
       }
     });
 
+    // هندل ارسال تراکنش
     document.getElementById('swap-btn').addEventListener('click', async () => {
       const amount = parseFloat(document.getElementById('from-amount').value);
       if (isNaN(amount) || amount <= 0) {
@@ -125,21 +136,21 @@
         return;
       }
 
-      const tonWallet = await tonConnectUI.connected;
-      if (!tonWallet) {
+      if (!wallet) {
         alert("Connect your wallet first.");
         return;
       }
 
+      // تبدیل مقدار به نانو تون (1 TON = 1e9 nanotons)
       const nanoTon = BigInt(Math.floor(amount * 1e9)).toString();
 
       try {
         await tonConnectUI.sendTransaction({
-          validUntil: Math.floor(Date.now() / 1000) + 300, // اعتبار ۵ دقیقه
+          validUntil: Math.floor(Date.now() / 1000) + 300, // ۵ دقیقه اعتبار
           messages: [{
             address: "EQBV-msNe9hMxkxeUxUdhrt5xHpoJBVCAgAizzyhqmx56S8g", // آدرس FIVE COIN
             amount: nanoTon,
-            payload: null
+            payload: "" // رشته خالی به جای null
           }]
         });
         alert("TON sent successfully! You'll receive FIVE shortly.");

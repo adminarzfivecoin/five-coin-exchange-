@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Five Exchange - پیشرفته</title>
+  <title>Five Exchange - سواپ پیشرفته</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
@@ -50,7 +50,11 @@
       font-weight: bold; font-size: 18px; cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    button:hover {
+    button:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
       background-color: #d4af37;
     }
     #tx-status {
@@ -67,6 +71,9 @@
       border: 1px solid #333; padding: 10px; border-radius: 8px;
       background-color: #2a2a2a;
     }
+    #history h4 {
+      margin-top: 0;
+    }
     #confirm-dialog {
       position: fixed;
       top: 50%; left: 50%;
@@ -78,11 +85,24 @@
       max-width: 350px;
       display: none;
       color: #fff;
+      text-align: center;
     }
     #confirm-dialog button {
       margin-top: 20px;
       width: 48%;
       font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+    #confirm-yes {
+      background-color: gold;
+      font-weight: bold;
+      color: #000;
+    }
+    #confirm-no {
+      background-color: #555;
+      color: #eee;
     }
     #overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -164,24 +184,17 @@
 </div>
 
 <script>
-  // آدرس رسمی توکن FIVE
   const FIVE_COIN_ADDRESS = "EQBV-msNe9hMxkxeUxUdhrt5xHpoJBVCAgAizzyhqmx56S8g";
+  const estimatedFee = 0.01; // TON
 
-  // نرخ تبدیل فرضی (می‌توان API جایگزین کرد)
-  // 1 TON = 100 FIVE
-  // این داده‌ها در واقع باید از API یا اوراکل بیاد
+  // نرخ تبدیل فرضی (در واقع باید از API گرفته شود)
   const exchangeRates = {
     "TON->FIVE": 100,
     "FIVE->TON": 0.0099
   };
 
-  // تخمین کارمزد (TON)
-  const estimatedFee = 0.01;
-
-  // تاریخچه تراکنش‌ها در localStorage
   let txHistory = JSON.parse(localStorage.getItem('txHistory') || '[]');
 
-  // UI و حالت‌ها
   const fromToken = document.getElementById('from-token');
   const toToken = document.getElementById('to-token');
   const fromAmount = document.getElementById('from-amount');
@@ -214,6 +227,7 @@
     if (!amount || amount <= 0) {
       toAmount.value = "";
       swapBtn.disabled = true;
+      rateInfo.textContent = "مقدار معتبر وارد کنید.";
       return;
     }
     if (fToken === tToken) {
@@ -222,7 +236,6 @@
       rateInfo.textContent = "توکن‌های مشابه انتخاب شده‌اند.";
       return;
     }
-    swapBtn.disabled = false;
     let rateKey = `${fToken}->${tToken}`;
     let rate = exchangeRates[rateKey];
     if (!rate) {
@@ -235,30 +248,8 @@
     toAmount.value = received.toFixed(6);
     rateInfo.textContent = `نرخ تبدیل: 1 ${fToken} = ${rate} ${tToken}`;
     feeInfo.textContent = `کارمزد تخمینی: ${estimatedFee} TON (تقریبی)`;
+    swapBtn.disabled = !connectedWallet; // فعال فقط در صورت اتصال کیف پول
   }
 
-  // بروزرسانی مقادیر وقتی ورودی تغییر می‌کند
-  fromToken.addEventListener('change', () => {
-    // اطمینان از اینکه توکن‌ها متفاوت باشند
-    if (fromToken.value === toToken.value) {
-      if (toToken.value === "TON") toToken.value = "FIVE";
-      else toToken.value = "TON";
-    }
-    updateToAmount();
-  });
-
-  toToken.addEventListener('change', () => {
-    if (fromToken.value === toToken.value) {
-      if (fromToken.value === "TON") fromToken.value = "FIVE";
-      else fromToken.value = "TON";
-    }
-    updateToAmount();
-  });
-
-  fromAmount.addEventListener('input', updateToAmount);
-
-  // به روز رسانی وضعیت کیف پول
-  tonConnectUI.onStatusChange(wallet => {
-    connectedWallet = wallet;
-    if (wallet && wallet.account) {
-      document.getElementById("wallet-address").textContent = "کیف پول:
+  // تغییر توکن‌ها باعث جلوگیری از انتخاب مشابه و بروزرسانی مقدار تخمینی
+  from
